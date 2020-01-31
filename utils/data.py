@@ -13,20 +13,24 @@ __all__ = ['dira20']
 class dira20(torch.utils.data.Dataset):
     """Some Information about dira20"""
 
-    def __init__(self, root: str, train=True):
+    def __init__(self, root: str, train=True, transform=None):
         super(dira20, self).__init__()
 
         self.is_train = train
-
-        if self.is_train:
-            self.image_path = root + 'train/'
-        else:
-            self.image_path = root + 'images/val/'
+        self.image_path = root
+        self.gt_folder = 'gt_image/'
+        self.gt_mask_folder = 'gt_binary_image/'
+        self.extension = '.png'
+        self.transform = transform
+        # if self.is_train:
+        #     self.image_path = root + 'train/'
+        # else:
+        #     self.image_path = root + 'images/val/'
 
         self.list_rgb = [os.path.splitext(os.path.basename(
-            x))[0] for x in os.listdir(self.image_path + 'rgb/')]
+            x))[0] for x in os.listdir(self.image_path + self.gt_folder)]
 
-        self.list_depth = self.list_rgb.copy()
+        # self.list_depth = self.list_rgb.copy()
 
         if self.is_train:
             self.list_mask = self.list_rgb.copy()
@@ -34,19 +38,21 @@ class dira20(torch.utils.data.Dataset):
         self.scale = 1
 
     def __getitem__(self, index):
-        im = Image.open(self.image_path + self.list_rgb[index])
+        im = Image.open(self.image_path + self.gt_folder +
+                        self.list_rgb[index] + self.extension)
 
-        mask = Image.open(self.image_path + self.list_mask[index])
+        mask = Image.open(self.image_path + self.gt_mask_folder +
+                          self.list_mask[index] + self.extension)
 
+        # im.show()
+        # mask.show()
         assert im.size == mask.size, \
             f'Image and mask {index} should be the same size, but are {im.size} and {mask.size}'
 
-        im = self.preprocess(im, self.scale)
-        mask = self.preprocess(mask, self.scale)
-
+        # im = self.preprocess(im, self.scale)
+        # mask = self.preprocess(mask, self.scale)
         im = tf.ToTensor()(im)
         mask = tf.ToTensor()(mask)
-
         return im, mask
 
     def __len__(self):
@@ -75,7 +81,7 @@ class dira20(torch.utils.data.Dataset):
 
 
 if __name__ == "__main__":
-    dataset = dira20('data/', train=True)
+    dataset = dira20('/home/ken/Documents/test_tensorRT/dataset/', train=True)
     print(len(dataset))
-    # for im, label in dataset:
-    # print(label)
+    for im, label in dataset:
+        break
