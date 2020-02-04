@@ -1,14 +1,14 @@
-from torch.utils.data import DataLoader, random_split
-from torch import nn
-from torchvision import transforms
-import tqdm
-import torch
-# from torchvision.transforms import Compose
-from torch.optim import Adam
-from torch.nn import BCELoss
-from utils import *
-from models import *
+import argparse
 
+import torch
+import tqdm
+from models import *
+from torch import nn
+from torch.nn import BCELoss
+from torch.optim import Adam
+from torch.utils.data import DataLoader, random_split
+from torchvision import transforms
+from utils import *
 
 random_seed = 213
 batch_size = 1
@@ -66,7 +66,24 @@ for e in tqdm.tqdm(range(n_epochs)):
     # e.update()
 print('Finished Training {}'.format(loss))
 
-torch.save(model.state_dict(), './baseline.pt')
+parser = argparse.ArgumentParser()
+parser.add_argument('--name', type=str, default='baseline', help='Name of file')
+parser.add_argument('--onnx', action='store_true', default=False, help='Save in ONNX format, i.e. baseline.onnx')
+args = parser.parse_args()
+print(args)
+
+if args.onnx:
+    model.eval() # important
+    input_names=["input"]
+    output_names=["output"]
+    with torch.no_grad():
+        dummy_input = torch.autograd.Variable(torch.rand(1, 3, 224, 224))
+        torch.onnx.export(model, dummy_input, f'{args.name}.onnx', verbose=True, 
+                          input_names=input_names, output_names=output_names)
+else:
+    torch.save(model.state_dict(), f'{args.name}.pt')
+
+print('Done.')
 # model.eval()
 # im = model(train_data[0][0].to('cuda').unsqueeze(0))[0].cpu()
 # print(im.shape)

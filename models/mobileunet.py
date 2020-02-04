@@ -54,7 +54,7 @@ class InvertedResidual(nn.Module):
 class MobileUnet(nn.Module):
     """Some Information about MobileUnet"""
 
-    def __init__(self, input_size=(224, 224, 3)):
+    def __init__(self):
         super(MobileUnet, self).__init__()
 
         self.mobilenet = mobilenet_v2(pretrained=True, progress=True)
@@ -151,8 +151,13 @@ class MobileUnet(nn.Module):
         x = self.conv_score(x)
         # print((x.shape, 'conv_score'))
 
-        x = nn.functional.interpolate(x, scale_factor=2, mode='bilinear',
-                                      align_corners=False)
+
+        # x = nn.functional.interpolate(x, scale_factor=2, mode='bilinear',
+        #                               align_corners=False)
+        # Use this instead when porting to TensorRT
+        # https://github.com/onnx/onnx-tensorrt/issues/192#issuecomment-526182296
+        sh = torch.tensor(x.shape)
+        x = nn.functional.interpolate(x, size=(sh[2] * 2, sh[3] * 2), mode='bilinear', align_corners=False)
         # print((x.shape, 'interpolate'))
 
         x = torch.sigmoid(x)
