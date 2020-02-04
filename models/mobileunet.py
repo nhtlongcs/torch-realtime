@@ -66,6 +66,7 @@ class MobileUnet(nn.Module):
         self.up2 = Up(96, 32, 32)
         self.up3 = Up(32, 24, 24)
         self.up4 = Up(24, 16, 16)
+        self.up5 = Up(16, 3, 3)
 
         self.dconv1 = nn.ConvTranspose2d(1280, 96, 4, padding=1, stride=2)
         self.invres1 = InvertedResidual(192, 96, 1, 6)
@@ -79,7 +80,10 @@ class MobileUnet(nn.Module):
         self.dconv4 = nn.ConvTranspose2d(24, 16, 4, padding=1, stride=2)
         self.invres4 = InvertedResidual(32, 16, 1, 6)
 
-        self.conv_last = nn.Conv2d(16, 3, 1)
+        self.dconv5 = nn.ConvTranspose2d(16, 3, 4, padding=1, stride=2)
+        self.invres5 = InvertedResidual(6, 3, 1, 6)
+
+        self.conv_last = nn.Conv2d(3, 3, 1)
         self.conv_score = nn.Conv2d(3, 1, 1)
 
         # init weights...
@@ -91,6 +95,7 @@ class MobileUnet(nn.Module):
 
     def forward(self, x):
         # print((x.shape, 'x'))
+        x0 = x
 
         for n in range(0, 2):
             x = self.mobilenet.features[n](x)
@@ -145,19 +150,25 @@ class MobileUnet(nn.Module):
         up4 = self.invres4(up4)
         # print((up4.shape, 'up4'))
 
-        x = self.conv_last(up4)
+        up5 = torch.cat([
+            x0,
+            self.dconv5(up4)
+        ], dim=1)
+        up5 = self.invres5(up5)
+
+        x = self.conv_last(up5)
         # print((x.shape, 'conv_last'))
 
         x = self.conv_score(x)
         # print((x.shape, 'conv_score'))
 
-
         # x = nn.functional.interpolate(x, scale_factor=2, mode='bilinear',
         #                               align_corners=False)
         # Use this instead when porting to TensorRT
         # https://github.com/onnx/onnx-tensorrt/issues/192#issuecomment-526182296
-        sh = torch.tensor(x.shape)
-        x = nn.functional.interpolate(x, size=(sh[2] * 2, sh[3] * 2), mode='bilinear', align_corners=False)
+        # sh = torch.tensor(x.shape)
+        # x = nn.functional.interpolate(
+        #     x, size=(sh[2] * 2, sh[3] * 2), mode='bilinear', align_corners=False)
         # print((x.shape, 'interpolate'))
 
         x = torch.sigmoid(x)
@@ -221,6 +232,7 @@ if __name__ == "__main__":
     rand_input = torch.rand((1, 3, 224, 224))
     logging.basicConfig()
     model = MobileUnet()
+    print(model)
     model.eval()
     with torch.no_grad():
         output = model(rand_input)

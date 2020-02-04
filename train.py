@@ -67,18 +67,21 @@ for e in tqdm.tqdm(range(n_epochs)):
 print('Finished Training {}'.format(loss))
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--name', type=str, default='baseline', help='Name of file')
-parser.add_argument('--onnx', action='store_true', default=False, help='Save in ONNX format, i.e. baseline.onnx')
+parser.add_argument('--name', type=str, default='baseline',
+                    help='Name of file')
+parser.add_argument('--onnx', action='store_true', default=False,
+                    help='Save in ONNX format, i.e. baseline.onnx')
 args = parser.parse_args()
 print(args)
 
 if args.onnx:
-    model.eval() # important
-    input_names=["input"]
-    output_names=["output"]
+    model.eval()  # important
+    input_names = ["input"]
+    output_names = ["output"]
     with torch.no_grad():
-        dummy_input = torch.autograd.Variable(torch.rand(1, 3, 224, 224))
-        torch.onnx.export(model, dummy_input, f'{args.name}.onnx', verbose=True, 
+        dummy_input = torch.autograd.Variable(
+            torch.rand(1, 3, 224, 224).cuda())
+        torch.onnx.export(model, dummy_input, f'{args.name}.onnx', verbose=True,
                           input_names=input_names, output_names=output_names)
 else:
     torch.save(model.state_dict(), f'{args.name}.pt')
