@@ -74,6 +74,7 @@ parser.add_argument('--onnx', action='store_true', default=False,
 args = parser.parse_args()
 print(args)
 
+torch.save(model.state_dict(), f'{args.name}.pt')
 if args.onnx:
     model.eval()  # important
     input_names = ["input"]
@@ -83,8 +84,6 @@ if args.onnx:
             torch.rand(1, 3, 224, 224).cuda())
         torch.onnx.export(model, dummy_input, f'{args.name}.onnx', verbose=True,
                           input_names=input_names, output_names=output_names)
-else:
-    torch.save(model.state_dict(), f'{args.name}.pt')
 
 print('Done.')
 # model.eval()

@@ -16,11 +16,11 @@ model = MobileUnet().to('cuda')
 model.load_state_dict(weights)
 model.eval()
 
-# create example data
-x = torch.ones((1, 3, 224, 224)).cuda()
+# # create example data
+# x = torch.ones((1, 3, 224, 224)).cuda()
 
-# convert to TensorRT feeding sample data as input
-model_trt = torch2trt(model, [x])
+# # convert to TensorRT feeding sample data as input
+# model_trt = torch2trt(model, [x])
 
 
 # save
@@ -32,7 +32,7 @@ model_trt = torch2trt(model, [x])
 
 img = Image.open('test.jpg')
 # img = img.convert('RGB')
-img = img.resize((224,224))
+img = img.resize((224, 224))
 img = transforms.ToTensor()(img).to('cuda')
 start = time.time()
 for i in range(1):
@@ -40,7 +40,8 @@ for i in range(1):
         # inputs = torch.rand((3,224,224)).unsqueeze(0).to('cuda')
         # pdb.set_trace()
         inputs = img.unsqueeze(0).to('cuda')
-        outputs = model_trt(inputs)
+        # outputs = model_trt(inputs)
+        outputs = model(inputs)
         print(outputs.shape)
 end = time.time()
 # print('fps = {}'.format(500/(end-start)))
