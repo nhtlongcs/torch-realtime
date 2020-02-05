@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from PIL import Image
 from torchvision import transforms as tf
-from sklearn.model_selection import train_test_split
+# from sklearn.model_selection import train_test_split
 
 
 __all__ = ['dira20']
