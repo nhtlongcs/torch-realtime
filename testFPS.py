@@ -6,7 +6,7 @@ from torchvision import transforms
 from models import *
 from PIL import Image
 import time
-weights = torch.load('./baseline.pt')
+weights = torch.load('./baseline.pth')
 
 model = MobileUnet().to('cuda')
 model.load_state_dict(weights)
@@ -24,5 +24,7 @@ for i in range(500):
         outputs = model(inputs)
         # print(outputs.shape)
 end = time.time()
+print(outputs.shape)
+outputs = torch.argmax(outputs, dim=1).float().cpu()
 print('fps = {}'.format(500/(end-start)))
-transforms.ToPILImage(mode='L')(outputs.squeeze(0).cpu()).save('outputs.jpg')
+transforms.ToPILImage(mode='L')(outputs).save('outputs.jpg')

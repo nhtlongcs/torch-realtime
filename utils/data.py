@@ -51,8 +51,12 @@ class dira20(torch.utils.data.Dataset):
 
         # im = self.preprocess(im, self.scale)
         # mask = self.preprocess(mask, self.scale)
+        im = tf.Resize((224,224))(im)
         im = tf.ToTensor()(im)
+        mask = tf.Resize((224,224))(mask)
         mask = tf.ToTensor()(mask)
+        mask[mask>0] = 1
+        mask = mask.long()
         return im, mask
 
     def __len__(self):

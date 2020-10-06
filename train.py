@@ -4,14 +4,15 @@ import torch
 import tqdm
 from models import *
 from torch import nn
-from torch.nn import BCELoss
+from torch.nn import BCELoss, CrossEntropyLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader, random_split
 from torchvision import transforms
 from utils import *
+import torch.nn.functional as F
 
 random_seed = 213
-batch_size = 1
+batch_size = 64
 lr = 0.001
 n_epochs = 5
 
@@ -37,11 +38,11 @@ transform_val = transforms.Compose(
 
 
 model = MobileUnet().to('cuda')
-criterion = BCELoss().to('cuda')
+criterion = CrossEntropyLoss().to('cuda')
 optimizer = Adam(model.parameters(), lr=lr)
 
 train_data = dira20(
-    '/home/ken/Documents/test_tensorRT/dataset/', train=True)
+    './data/', train=True)
 # val_data = dira20('/home/ken/Documents/test_tensorRT/dataset/', train=True)
 
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
@@ -58,6 +59,10 @@ for e in tqdm.tqdm(range(n_epochs)):
 
         # forward + backward + optimize
         outputs = model(inputs)
+        outputs = outputs.squeeze(1)
+        labels = labels.squeeze(1)
+        # print(outputs.shape)
+        # print(labels.shape)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
