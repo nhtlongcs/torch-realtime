@@ -45,28 +45,36 @@ class InvertedResidual(nn.Module):
             )
 
     def forward(self, x):
-        if self.use_res_connect:
-            return x + self.conv(x)
-        else:
-            return self.conv(x)
-
+        # if self.use_res_connect:
+        #     return x + self.conv(x)
+        # else:
+        #     return self.conv(x)
+        return self.conv(x)
 
 class MobileUnet(nn.Module):
     """Some Information about MobileUnet"""
 
+    __constants__ = ['mobilenet']
+
     def __init__(self):
         super(MobileUnet, self).__init__()
 
-        self.mobilenet = mobilenet_v2(pretrained=True, progress=True)
-        for param in self.mobilenet.parameters():
+        mobilenet = mobilenet_v2(pretrained=True, progress=True)
+        for param in mobilenet.parameters():
             param.requires_grad_(False)
 
+        self.down1 = nn.Sequential(*mobilenet.features[0:2])
+        self.down2 = nn.Sequential(*mobilenet.features[2:4])
+        self.down3 = nn.Sequential(*mobilenet.features[4:7])
+        self.down4 = nn.Sequential(*mobilenet.features[7:14])
+        self.down5 = nn.Sequential(*mobilenet.features[14:19])
+
         # sizes = [320] + [160]*3 + [96]*3 + [64]*4 + [32]*3 + [24]*2 + [16]
-        self.up1 = Up(self.mobilenet.classifier[1].in_features, 96, 96)
-        self.up2 = Up(96, 32, 32)
-        self.up3 = Up(32, 24, 24)
-        self.up4 = Up(24, 16, 16)
-        self.up5 = Up(16, 3, 3)
+        # self.up1 = torch.jit.script(Up(mobilenet.classifier[1].in_features, 96, 96))
+        # self.up2 = torch.jit.script(Up(96, 32, 32))
+        # self.up3 = torch.jit.script(Up(32, 24, 24))
+        # self.up4 = torch.jit.script(Up(24, 16, 16))
+        # self.up5 = torch.jit.script(Up(16, 3, 3))
 
         self.dconv1 = nn.ConvTranspose2d(1280, 96, 4, padding=1, stride=2)
         self.invres1 = InvertedResidual(192, 96, 1, 6)
@@ -84,7 +92,7 @@ class MobileUnet(nn.Module):
         self.invres5 = InvertedResidual(6, 3, 1, 6)
 
         self.conv_last = nn.Conv2d(3, 3, 1)
-        self.conv_score = nn.Conv2d(3, 1, 1)
+        self.conv_score = nn.Conv2d(3, 2, 1)
 
         # init weights...
 
@@ -96,30 +104,15 @@ class MobileUnet(nn.Module):
     def forward(self, x):
         # print((x.shape, 'x'))
         x0 = x
-
-        for n in range(0, 2):
-            x = self.mobilenet.features[n](x)
-        x1 = x
+        x1 = x = self.down1(x)
         # print((x1.shape, 'x1'))
-
-        for n in range(2, 4):
-            x = self.mobilenet.features[n](x)
-        x2 = x
+        x2 = x = self.down2(x)
         # print((x2.shape, 'x2'))
-
-        for n in range(4, 7):
-            x = self.mobilenet.features[n](x)
-        x3 = x
+        x3 = x = self.down3(x)
         # print((x3.shape, 'x3'))
-
-        for n in range(7, 14):
-            x = self.mobilenet.features[n](x)
-        x4 = x
+        x4 = x = self.down4(x)
         # print((x4.shape, 'x4'))
-
-        for n in range(14, 19):
-            x = self.mobilenet.features[n](x)
-        x5 = x
+        x5 = x = self.down5(x)
         # print((x5.shape, 'x5'))
 
         up1 = torch.cat([
@@ -171,7 +164,7 @@ class MobileUnet(nn.Module):
         #     x, size=(sh[2] * 2, sh[3] * 2), mode='bilinear', align_corners=False)
         # print((x.shape, 'interpolate'))
 
-        x = torch.sigmoid(x)
+        # x = torch.sigmoid(x)
 
         return x
 
