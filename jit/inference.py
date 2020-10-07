@@ -29,7 +29,7 @@ if __name__ == "__main__":
     model.eval()
     with torch.no_grad():
         output = model(rand_input)
-
+    output = torch.argmax(output, dim = 1).float()
     print(output)
     print(output.max())
 

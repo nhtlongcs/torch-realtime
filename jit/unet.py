@@ -92,7 +92,7 @@ class MobileUnet(nn.Module):
         self.invres5 = InvertedResidual(6, 3, 1, 6)
 
         self.conv_last = nn.Conv2d(3, 3, 1)
-        self.conv_score = nn.Conv2d(3, 1, 1)
+        self.conv_score = nn.Conv2d(3, 2, 1)
 
         # init weights...
 
@@ -164,7 +164,7 @@ class MobileUnet(nn.Module):
         #     x, size=(sh[2] * 2, sh[3] * 2), mode='bilinear', align_corners=False)
         # print((x.shape, 'interpolate'))
 
-        x = torch.sigmoid(x)
+        # x = torch.sigmoid(x)
 
         return x
 

@@ -33,6 +33,7 @@ if __name__ == "__main__":
 
     with torch.no_grad():
         output = script_model(rand_input)
+    output = torch.argmax(output, dim = 1).float()
 
     output = transforms.ToPILImage(mode='L')(output.squeeze(0).cpu())
     output = output.resize((320, 240))
