@@ -13,8 +13,7 @@ if __name__ == "__main__":
 
     transform_val = transforms.Compose(
         [
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
+            transforms.Resize((224,224)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
                 0.229, 0.224, 0.225]),
@@ -33,8 +32,9 @@ if __name__ == "__main__":
     print(output)
     print(output.max())
 
-    transforms.ToPILImage(mode='L')(output.squeeze(0).cpu()).save('output.jpg')
-
-
+    
+    output = transforms.ToPILImage(mode='L')(output.squeeze(0).cpu())
+    output = output.resize((320, 240))
+    output.save('output.jpg')
 
     
