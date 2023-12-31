@@ -14,8 +14,15 @@ TorchScript, a statically-typed, high-performance subset of Python, is designed 
 
 To begin, navigate to the respective directories for classification and segmentation tutorials. Follow the step-by-step instructions to create models, train them, and convert them into JIT and TorchScript formats. We also do some compare between two result, include the errors and fps calculation.
 
-- [Segmentation Tutorial](./tutorials/segmentation.ipynb)
-- [Image Classification Tutorial](./tutorials/classification.ipynb)
+[Segmentation Tutorial](./tutorials/segmentation.ipynb)
+<a target="_blank" href="https://colab.research.google.com/github/nhtlongcs/torch-realtime/blob/master/tutorials/segmentation.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
+[Image Classification Tutorial](./tutorials/classification.ipynb) 
+<a target="_blank" href="https://colab.research.google.com/github/nhtlongcs/torch-realtime/blob/master/tutorials/classification.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 ## Key Steps
 
