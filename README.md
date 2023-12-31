@@ -1,86 +1,60 @@
 # PyTorch Tutorial: Classification and Segmentation with JIT and TorchScript
 
+Welcome to our PyTorch tutorial, where we'll guide you through the process of solving classification and segmentation problems. Here, we'll cover the transformation of your trained PyTorch models into JIT (Just-In-Time) and TorchScript formats. This will make them compatible with C++ environments, facilitating seamless integration and execution.
+
 ## Overview
 
-This repository provides a tutorial on solving two traditional problems - classification and segmentation - using PyTorch. The main emphasis is on converting the trained models into JIT (Just-In-Time) and TorchScript formats, enabling them to be seamlessly integrated and executed in C++ environments.
+This tutorial focuses on addressing two conventional challenges: classification and segmentation using PyTorch. The highlight of our guide is the conversion of trained models into JIT and TorchScript formats. This conversion ensures easy integration and execution in C++ environments.
 
-## Table of Contents
+## Introduction to TorchScript
 
-1. [Introduction](#introduction)
-2. [Requirements](#requirements)
-3. [Installation](#installation)
-4. [Usage](#usage)
-5. [Structure of the Repository](#repository-structure)
-6. [Classification Tutorial](#classification-tutorial)
-7. [Segmentation Tutorial](#segmentation-tutorial)
-8. [Converting to JIT and TorchScript](#converting-to-jit-and-torchscript)
-9. [Running in C++](#running-in-c++)
-10. [Contributing](#contributing)
-11. [License](#license)
-
-## Introduction
-
-PyTorch is a powerful deep learning framework, and this tutorial aims to guide users through implementing classification and segmentation tasks using PyTorch. Additionally, it provides instructions on converting these models into JIT and TorchScript formats for deployment in C++ applications.
-
-## Requirements
-
-Ensure you have the following dependencies installed:
-
-- Python (>=3.6)
-- PyTorch (>=1.6)
-- torchvision
-- C++ compiler (for running JIT and TorchScript in C++)
-
-## Installation
-
-Clone the repository to your local machine:
-
-```bash
-git clone https://github.com/nhtlongcs/torch-realtime/
-cd PyTorch-JIT-Tutorial
-```
-
-Install the required Python packages:
-
-```bash
-pip install -r requirements.txt
-```
+TorchScript, a statically-typed, high-performance subset of Python, is designed for representing PyTorch models. Explore its advantages, including improved execution speed and compatibility with C++.
 
 ## Usage
 
-Follow the tutorials in the respective directories for classification and segmentation. The tutorials provide step-by-step guidance on creating models, training, and converting them into JIT and TorchScript formats.
+To begin, navigate to the respective directories for classification and segmentation tutorials. Follow the step-by-step instructions to create models, train them, and convert them into JIT and TorchScript formats. We also do some compare between two result, include the errors and fps calculation.
 
-```bash
-cd classification_tutorial
-python train_classification.py
-python convert_to_jit_and_torchscript.py
+- [Segmentation Tutorial](./tutorials/segmentation.ipynb)
+- [Image Classification Tutorial](./tutorials/classification.ipynb)
+
+## Key Steps
+
+In both tutorials, you'll follow a series of steps with variations based on the specific problem and input data.
+
+### Step 1: Prepare Your PyTorch Model
+
+Ensure that your PyTorch model is well-defined and trained. Encapsulate the forward pass logic cleanly for a smooth conversion process.
+
+### Step 2: Convert PyTorch to TorchScript
+
+Use the `torch.jit.trace` function to convert your PyTorch model into TorchScript. This takes two main parameters, includes a callable (e.g., a function or method) that you want to convert to TorchScript and an example input that the function will be traced with. This example input helps TorchScript to trace the operations and build the computational graph.
+
+```python
+import torch
+
+# Define your PyTorch model
+class MyModel(torch.nn.Module):
+    # ... (define your model architecture)
+
+# Create an instance of your model
+model = MyModel()
+
+# Create an example input
+input = torch.rand(C, W, H) 
+
+# Convert to TorchScript
+script_model = torch.jit.trace(model, input)
+with torch.no_grad():
+    output = script_model(input)
+
+# Save to file
+script_model.save('model.pth') 
 ```
 
-```bash
-cd segmentation_tutorial
-python train_segmentation.py
-python convert_to_jit_and_torchscript.py
-```
+### Step 3: Integrating with C++ for Edge Deployment
 
-## Repository Structure
+Integrate the saved TorchScript model into your C++ application using the PyTorch C++ API. This enables inference in your C++ code. Refer to the official PyTorch documentation for detailed information on integrating TorchScript with C++. Make sure to have the necessary C++ compiler and dependencies installed, such as libtorch.
 
-- `classification_tutorial/`: Contains the classification tutorial.
-- `segmentation_tutorial/`: Contains the segmentation tutorial.
-- `utils/`: Utility functions and scripts.
-- `requirements.txt`: Python dependencies.
+## Conclusion
 
-## Classification Tutorial
-
-In this tutorial, we cover the implementation of a classification model using PyTorch. Follow the steps outlined in the README within the `classification_tutorial` directory.
-
-## Segmentation Tutorial
-
-The segmentation tutorial focuses on implementing a segmentation model using PyTorch. Follow the steps outlined in the README within the `segmentation_tutorial` directory.
-
-## Converting to JIT and TorchScript
-
-Learn how to convert your trained PyTorch models into JIT and TorchScript formats using the provided scripts.
-
-## Running in C++
-
-Detailed instructions on running the converted models in a C++ environment are provided in this section. Ensure you have the necessary C++ compiler and dependencies installed.
+By following these steps, you'll be equipped to integrate your PyTorch models into C++ environments, allowing for efficient deployment on edge devices. Experiment with your own models and datasets, and explore the possibilities of extending this integration for real-world applications. Happy coding.
