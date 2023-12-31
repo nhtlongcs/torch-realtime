@@ -8,11 +8,11 @@ This tutorial focuses on addressing two conventional challenges: classification 
 
 ## Introduction to TorchScript
 
-TorchScript, a statically-typed, high-performance subset of Python, is designed for representing PyTorch models. Explore its advantages, including improved execution speed and compatibility with C++.
+TorchScript, a statically typed, high-performance subset of Python, is designed for representing PyTorch models. Explore its advantages, including improved execution speed and compatibility with C++.
 
 ## Usage
 
-To begin, navigate to the respective directories for classification and segmentation tutorials. Follow the step-by-step instructions to create models, train them, and convert them into JIT and TorchScript formats. We also do some compare between two result, include the errors and fps calculation.
+To begin, navigate to the respective directories for classification and segmentation tutorials. Follow the step-by-step instructions to create models, train them, and convert them into JIT and TorchScript formats. We also do some comparison between the two results, including the errors and fps calculation.
 
 [Segmentation Tutorial](./tutorials/segmentation.ipynb)
 <a target="_blank" href="https://colab.research.google.com/github/nhtlongcs/torch-realtime/blob/master/tutorials/segmentation.ipynb">
